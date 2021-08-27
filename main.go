@@ -20,7 +20,6 @@ func main() {
 	fmt.Println(list.Contains("00"))
 	fmt.Println(list.IndexOf("cc"))
 	fmt.Println(list.IndexOf("00"))
-	list.Remove("dd")
 	list.Print()
 	list.Remove("ee")
 	list.Push("22")
@@ -32,4 +31,15 @@ func main() {
 	list.Set(1, "11")
 	list.Print()
 	fmt.Println("Length = ", list.GetLength())
+	head, err := list.GetHead()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Head = ", head)
+	tail, err := list.GetTail()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Tail = ", tail)
+
 }

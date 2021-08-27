@@ -15,8 +15,10 @@ type linkedList struct {
 
 type LinkedList interface {
 	GetLength() int
+	GetHead() (string, error)
+	GetTail() (string, error)
 	InsertAfter(index int, data string) error
-	Pop() error
+	Pop() (string, error)
 	Add(data string)
 	Push(data string)
 	Contains(data string) bool
@@ -29,6 +31,24 @@ type LinkedList interface {
 
 func NewLinkedList() LinkedList {
 	return &linkedList{}
+}
+
+func (l *linkedList) GetHead() (string, error) {
+	fmt.Printf("...Getting head of the list...")
+	if l.length == 0 {
+		err := fmt.Errorf("[error: empty list]")
+		return "(null)", err
+	}
+	return l.head.data, nil
+}
+
+func (l *linkedList) GetTail() (string, error) {
+	fmt.Printf("...Getting tail of the list...")
+	if l.length == 0 {
+		err := fmt.Errorf("[error: empty list]")
+		return "(null)", err
+	}
+	return l.tail.data, nil
 }
 
 func (l *linkedList) Print() {
@@ -88,33 +108,41 @@ func (l *linkedList) InsertAfter(index int, data string) error {
 	node := &node{
 		data: data,
 	}
-	pointer := l.head
-	for i := 0; i <= index; i++ {
-		if i == index {
-			node.next = pointer.next
-			pointer.next = node
-			l.length++
-			fmt.Println("[Success!]")
-		} else {
-			pointer = pointer.next
+	if index == l.length-1 {
+		currentTail := l.tail
+		currentTail.next = node
+		l.tail = node
+		l.length++
+	} else {
+		pointer := l.head
+		for i := 0; i <= index; i++ {
+			if i == index {
+				node.next = pointer.next
+				pointer.next = node
+				l.length++
+				fmt.Println("[Success!]")
+			} else {
+				pointer = pointer.next
+			}
 		}
 	}
 
 	return nil
 }
 
-func (l *linkedList) Pop() error {
+func (l *linkedList) Pop() (string, error) {
 	fmt.Printf("...Poping the first node...")
 	if l.head == nil {
-		err := fmt.Errorf("[error: empty list]\n")
-		return err
+		err := fmt.Errorf("[error: empty list]")
+		fmt.Println(err)
+		return "", err
 	}
 	data := l.head.data
 	fmt.Printf("\"%v\"...", data)
 	l.head = l.head.next
 	l.length--
 	fmt.Println("[Success!]")
-	return nil
+	return data, nil
 }
 
 func (l *linkedList) Contains(data string) bool {
@@ -148,7 +176,13 @@ func (l *linkedList) Remove(data string) error {
 	var prevPointer *node
 	for i := 0; i < l.length; i++ {
 		if pointer.data == data {
-			prevPointer.next = pointer.next
+			if i == 0 {
+				l.head = l.head.next
+			} else if i == l.length-1 {
+				l.tail = prevPointer
+			} else {
+				prevPointer.next = pointer.next
+			}
 			l.length--
 			fmt.Println("[Success!]")
 			return nil
@@ -168,20 +202,26 @@ func (l *linkedList) RemoveByIndex(index int) error {
 		fmt.Println(err)
 		return err
 	}
+
 	pointer := l.head
 	var prevPointer *node
-	for i := 0; i < l.length; i++ {
-		if i == index {
-			prevPointer.next = pointer.next
-			l.length--
-			fmt.Println("[Success!]")
-			return nil
-		} else {
-			prevPointer = pointer
-			pointer = pointer.next
+	if index == 0 {
+		l.head = l.head.next
+	} else {
+		for i := 0; i < l.length; i++ {
+			if i == index {
+				prevPointer.next = pointer.next
+				if index == l.length-1 {
+					l.tail = prevPointer
+				}
+			} else {
+				prevPointer = pointer
+				pointer = pointer.next
+			}
 		}
 	}
-
+	l.length--
+	fmt.Println("[Success!]")
 	return nil
 }
 
@@ -192,15 +232,21 @@ func (l *linkedList) Set(index int, data string) error {
 		fmt.Println(err)
 		return err
 	}
-	pointer := l.head
-	for i := 0; i < l.length; i++ {
-		if i == index {
-			pointer.data = data
-			fmt.Println("[Success!]")
-			return nil
-		} else {
-			pointer = pointer.next
+	if index == 0 {
+		l.head.data = data
+	} else if index == l.length-1 {
+		l.tail.data = data
+	} else {
+		pointer := l.head
+		for i := 0; i < l.length; i++ {
+			if i == index {
+				pointer.data = data
+			} else {
+				pointer = pointer.next
+			}
 		}
+		fmt.Println("[Success!]")
+		return nil
 	}
 	return nil
 }

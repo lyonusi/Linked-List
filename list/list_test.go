@@ -10,7 +10,7 @@ import (
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including a T() method which
 // returns the current testing context
-type ListListTestSuite struct {
+type ListTestSuite struct {
 	suite.Suite
 	singleNodeValue   string
 	emptyList         *linkedList
@@ -20,7 +20,7 @@ type ListListTestSuite struct {
 }
 
 // before each test
-func (s *ListListTestSuite) SetupTest() {
+func (s *ListTestSuite) SetupTest() {
 
 	s.singleNodeValue = "single"
 	s.emptyList = &linkedList{}
@@ -62,12 +62,12 @@ func (s *ListListTestSuite) SetupTest() {
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
 func TestListListTestSuite(t *testing.T) {
-	suite.Run(t, new(ListListTestSuite))
+	suite.Run(t, new(ListTestSuite))
 }
 
 // All methods that begin with "Test" are run as tests within a
 // suite.
-func (s *ListListTestSuite) TestAddShouldAddNodeToHeadIfListIsEmpty() {
+func (s *ListTestSuite) TestAddShouldAddNodeToHeadIfListIsEmpty() {
 	nodeValue := "new"
 	s.emptyList.Add(nodeValue)
 	s.Assert().Equal(nodeValue, s.emptyList.head.data)
@@ -79,7 +79,7 @@ func (s *ListListTestSuite) TestAddShouldAddNodeToHeadIfListIsEmpty() {
 	s.Assert().Equal(1, s.emptyList.length)
 }
 
-func (s *ListListTestSuite) TestAddShouldAddNodeToTailIfListHasOneNode() {
+func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasOneNode() {
 	nodeValue := "new"
 	s.listWithOneItem.Add(nodeValue)
 	s.Assert().Equal(s.singleNodeValue, s.listWithOneItem.head.data)
@@ -91,17 +91,15 @@ func (s *ListListTestSuite) TestAddShouldAddNodeToTailIfListHasOneNode() {
 	s.Assert().Equal(2, s.listWithOneItem.length)
 }
 
-func (s *ListListTestSuite) TestAddShouldAddNodeToTailIfListHasManyNode() {
+func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasManyNode() {
 	nodeValue := "new"
 	s.listWithManyItems.Add(nodeValue)
 	s.Assert().Equal("1", s.listWithManyItems.head.data)
 	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
 	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.next.data)
-
 	s.Assert().Equal(nodeValue, s.listWithManyItems.head.next.next.next.next.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.tail.data)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
-
 	s.Assert().Equal(5, s.listWithManyItems.length)
 }
