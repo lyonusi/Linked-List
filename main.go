@@ -11,8 +11,7 @@ func main() {
 	list.Add("aa")
 	list.Add("bb")
 	list.Add("cc")
-	list.InsertAfter(4, "dd")
-	list.InsertAfter(3, "dd")
+	list.InsertAfter(-4, "dd")
 	list.Print()
 	fmt.Println(list.Contains("cc"))
 	list.Pop()
@@ -30,16 +29,4 @@ func main() {
 	list.Set(6, "11")
 	list.Set(1, "11")
 	list.Print()
-	fmt.Println("Length = ", list.GetLength())
-	head, err := list.GetHead()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Head = ", head)
-	tail, err := list.GetTail()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Tail = ", tail)
-
 }
