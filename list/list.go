@@ -3,7 +3,7 @@ package list
 import "fmt"
 
 type node struct {
-	data string
+	data interface{}
 	next *node
 }
 
@@ -14,18 +14,18 @@ type linkedList struct {
 }
 
 type LinkedList interface {
-	Add(data string)
-	Contains(data string) bool
-	IndexOf(data string) int
-	InsertAfter(index int, data string) error
-	Pop() (string, error)
-	Push(data string)
-	Remove(data string) error
+	Add(data interface{})
+	Contains(data interface{}) bool
+	IndexOf(data interface{}) int
+	InsertAfter(index int, data interface{}) error
+	Pop() (interface{}, error)
+	Push(data interface{})
+	Remove(data interface{}) error
 	RemoveByIndex(index int) error
-	Set(index int, data string) error
+	Set(index int, data interface{}) error
 	GetLength() int
-	GetHead() (string, error)
-	GetTail() (string, error)
+	GetHead() (interface{}, error)
+	GetTail() (interface{}, error)
 	Print()
 }
 
@@ -33,7 +33,7 @@ func NewLinkedList() LinkedList {
 	return &linkedList{}
 }
 
-func (l *linkedList) GetHead() (string, error) {
+func (l *linkedList) GetHead() (interface{}, error) {
 	fmt.Printf("...Getting head of the list...")
 	if l.length == 0 {
 		err := fmt.Errorf("[error: empty list]")
@@ -46,7 +46,7 @@ func (l *linkedList) GetLength() (len int) {
 	return l.length
 }
 
-func (l *linkedList) GetTail() (string, error) {
+func (l *linkedList) GetTail() (interface{}, error) {
 	fmt.Printf("...Getting tail of the list...")
 	if l.length == 0 {
 		err := fmt.Errorf("[error: empty list]")
@@ -56,8 +56,8 @@ func (l *linkedList) GetTail() (string, error) {
 }
 
 func (l *linkedList) Print() {
-	fmt.Printf("...Printing...\n")
-	fmt.Printf("-------- START --------\n")
+	// fmt.Printf("...Printing...\n")
+	fmt.Printf("-------- PRINTING ---------\n")
 	pointer := l.head
 	for pointer != nil {
 		fmt.Printf("%v -> ", pointer.data)
@@ -75,10 +75,10 @@ func (l *linkedList) Print() {
 		fmt.Println("Tail is nil")
 	}
 	fmt.Println("Tail =", l.tail.data)
-	fmt.Printf("--------- END ---------\n")
+	fmt.Printf("----------- END -----------\n")
 }
 
-func (l *linkedList) Add(data string) {
+func (l *linkedList) Add(data interface{}) {
 	fmt.Printf("...Adding \"%v\" to the list...", data)
 	node := &node{
 		data: data,
@@ -94,7 +94,7 @@ func (l *linkedList) Add(data string) {
 	fmt.Println("[Success!]")
 }
 
-func (l *linkedList) Contains(data string) bool {
+func (l *linkedList) Contains(data interface{}) bool {
 	fmt.Printf("...Checking if the list contains \"%v\"...\n", data)
 	pointer := l.head
 	for i := 0; i < l.length; i++ {
@@ -107,7 +107,7 @@ func (l *linkedList) Contains(data string) bool {
 	return false
 }
 
-func (l *linkedList) IndexOf(data string) int {
+func (l *linkedList) IndexOf(data interface{}) int {
 	fmt.Printf("...Searching \"%v\" in the list...\n", data)
 	pointer := l.head
 	for i := 0; i < l.length; i++ {
@@ -120,7 +120,7 @@ func (l *linkedList) IndexOf(data string) int {
 	return -1
 }
 
-func (l *linkedList) InsertAfter(index int, data string) error {
+func (l *linkedList) InsertAfter(index int, data interface{}) error {
 	fmt.Printf("...Inserting \"%v\" after node(%v) to the list...", data, index)
 	if l.length == 0 {
 		err := fmt.Errorf("[error: empty list]")
@@ -162,7 +162,7 @@ func (l *linkedList) InsertAfter(index int, data string) error {
 	return nil
 }
 
-func (l *linkedList) Pop() (string, error) {
+func (l *linkedList) Pop() (interface{}, error) {
 	fmt.Printf("...Poping the first node...")
 	if l.head == nil {
 		err := fmt.Errorf("[error: empty list]")
@@ -180,7 +180,7 @@ func (l *linkedList) Pop() (string, error) {
 	return data, nil
 }
 
-func (l *linkedList) Push(data string) {
+func (l *linkedList) Push(data interface{}) {
 	fmt.Printf("...Pushing \"%v\" to the list...", data)
 	node := &node{
 		data: data,
@@ -197,7 +197,7 @@ func (l *linkedList) Push(data string) {
 	fmt.Println("[Success!]")
 }
 
-func (l *linkedList) Remove(data string) error {
+func (l *linkedList) Remove(data interface{}) error {
 	fmt.Printf("...Removing \"%v\" from the list...", data)
 	pointer := l.head
 	var prevPointer *node
@@ -268,7 +268,7 @@ func (l *linkedList) RemoveByIndex(index int) error {
 	return nil
 }
 
-func (l *linkedList) Set(index int, data string) error {
+func (l *linkedList) Set(index int, data interface{}) error {
 	fmt.Printf("...Setting node(%v) as \"%v\"...", index, data)
 	if l.length == 0 {
 		err := fmt.Errorf("[error: empty list]")
