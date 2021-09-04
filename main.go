@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/pguo-480/Linked-List/list"
+	"github.com/lyonusi/Linked-List/list"
 )
 
 type testData struct {
