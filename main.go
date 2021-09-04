@@ -1,8 +1,8 @@
 package main
 
 import (
+	"Linked-List/list"
 	"fmt"
-	"linkedList/list"
 )
 
 func main() {

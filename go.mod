@@ -1,4 +1,4 @@
-module linkedList
+module github.com/pguo-480/Linked-List
 
 go 1.15
 
