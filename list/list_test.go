@@ -2,17 +2,32 @@ package list
 
 // Basic imports
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
+
+type testData struct {
+	data string
+}
+
+func (t *testData) Compare(d Data) (bool, error) {
+	// Convert input d (a struct implementing list.Data interface) to TestData, "ok" will be false if fields of d not match with fields in TestData
+	compareData, ok := d.(*testData)
+	if !ok {
+		return false, fmt.Errorf("Input cannot be converted to TestData")
+	} else {
+		return t.data == compareData.data, nil
+	}
+}
 
 // Define the suite, and absorb the built-in basic suite
 // functionality from testify - including a T() method which
 // returns the current testing context
 type ListTestSuite struct {
 	suite.Suite
-	singleNodeValue   string
+	singleNodeValue   Data
 	emptyList         *linkedList
 	listWithOneItem   *linkedList
 	listWithTwoItems  *linkedList
@@ -22,7 +37,7 @@ type ListTestSuite struct {
 // before each test
 func (s *ListTestSuite) SetupTest() {
 
-	s.singleNodeValue = "single"
+	s.singleNodeValue = &testData{"single"}
 	s.emptyList = &linkedList{}
 
 	singleNode := &node{
@@ -38,7 +53,7 @@ func (s *ListTestSuite) SetupTest() {
 	s.listWithTwoItems = &linkedList{
 		length: 2,
 		head: &node{
-			data: "1",
+			data: &testData{"1"},
 			next: singleNode,
 		},
 		tail: singleNode,
@@ -47,11 +62,11 @@ func (s *ListTestSuite) SetupTest() {
 	s.listWithManyItems = &linkedList{
 		length: 4,
 		head: &node{
-			data: "1",
+			data: &testData{"1"},
 			next: &node{
-				data: "2",
+				data: &testData{"2"},
 				next: &node{
-					data: "3",
+					data: &testData{"3"},
 					next: singleNode,
 				},
 			}},
@@ -68,7 +83,7 @@ func TestListListTestSuite(t *testing.T) {
 // All methods that begin with "Test" are run as tests within a
 // suite.
 func (s *ListTestSuite) TestAddShouldAddNodeToHeadIfListIsEmpty() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.emptyList.Add(nodeValue)
 	s.Assert().Equal(nodeValue, s.emptyList.head.data)
 	s.Assert().Nil(s.emptyList.head.next)
@@ -80,7 +95,7 @@ func (s *ListTestSuite) TestAddShouldAddNodeToHeadIfListIsEmpty() {
 }
 
 func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasOneNode() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.listWithOneItem.Add(nodeValue)
 	s.Assert().Equal(s.singleNodeValue, s.listWithOneItem.head.data)
 
@@ -92,11 +107,11 @@ func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasOneNode() {
 }
 
 func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasManyNode() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.listWithManyItems.Add(nodeValue)
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.next.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.head.next.next.next.next.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.tail.data)
@@ -106,21 +121,21 @@ func (s *ListTestSuite) TestAddShouldAddNodeToTailIfListHasManyNode() {
 
 func (s *ListTestSuite) TestInsertAfterShouldReturnErrorIfListIsEmpty() {
 	index := 0
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.Assert().EqualError(s.emptyList.InsertAfter(index, nodeValue), "[error: empty list]")
 }
 func (s *ListTestSuite) TestInsertAfterShouldReturnErrorIfIndexExceededLength() {
 	index := 5
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.Assert().EqualError(s.listWithTwoItems.InsertAfter(index, nodeValue), "[invalid index: exceeded maximum index (1)]")
 }
 func (s *ListTestSuite) TestInsertAfterShouldReturnErrorIfIndexIsNegative() {
 	index := -10
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 	s.Assert().EqualError(s.listWithTwoItems.InsertAfter(index, nodeValue), "[invalid index: should be [0 - 1]]")
 }
 func (s *ListTestSuite) TestInsertAfterShouldAddNodeAtTailIfIndexEqualsLength() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 
 	index := 0
 	s.listWithOneItem.InsertAfter(index, nodeValue)
@@ -137,9 +152,9 @@ func (s *ListTestSuite) TestInsertAfterShouldAddNodeAtTailIfIndexEqualsLength() 
 	s.listWithManyItems.InsertAfter(index, nodeValue)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.tail.data)
 
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.next.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.head.next.next.next.next.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.tail.data)
@@ -148,7 +163,7 @@ func (s *ListTestSuite) TestInsertAfterShouldAddNodeAtTailIfIndexEqualsLength() 
 }
 
 func (s *ListTestSuite) TestInsertAfterShouldAddNodeAfterIndexedNode() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 
 	index := 0
 	s.listWithTwoItems.InsertAfter(index, nodeValue)
@@ -157,9 +172,9 @@ func (s *ListTestSuite) TestInsertAfterShouldAddNodeAfterIndexedNode() {
 	index = 2
 	s.listWithManyItems.InsertAfter(index, nodeValue)
 
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.tail.data)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.head.next.next.next.data)
@@ -169,13 +184,13 @@ func (s *ListTestSuite) TestInsertAfterShouldAddNodeAfterIndexedNode() {
 
 func (s *ListTestSuite) TestPopShouldReturnErrorIfListIsEmpty() {
 	result, err := s.emptyList.Pop()
-	s.Assert().Equal("", result)
+	s.Assert().Nil(result)
 	s.Assert().EqualError(err, "[error: empty list]")
 }
 
 func (s *ListTestSuite) TestPopShouldReturnHeadIfListHasOneNode() {
 	result, err := s.listWithOneItem.Pop()
-	s.Assert().Equal("single", result)
+	s.Assert().Equal(&testData{"single"}, result)
 	s.Assert().Nil(err)
 	s.Assert().Equal(0, s.listWithOneItem.length)
 	s.Assert().Equal(s.emptyList, s.listWithOneItem)
@@ -183,17 +198,17 @@ func (s *ListTestSuite) TestPopShouldReturnHeadIfListHasOneNode() {
 
 func (s *ListTestSuite) TestPopShouldReturnHeadIfListHasManyNodes() {
 	result, err := s.listWithManyItems.Pop()
-	s.Assert().Equal("1", result)
+	s.Assert().Equal(&testData{"1"}, result)
 	s.Assert().Nil(err)
 	s.Assert().Equal(3, s.listWithManyItems.length)
-	s.Assert().Equal("2", s.listWithManyItems.head.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.data)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
 }
 
 func (s *ListTestSuite) TesContainsShouldReturnFalseIfListDoesNotContainItem() {
-	testValue := "a"
+	testValue := &testData{"a"}
 	s.Assert().Equal(false, s.emptyList.Contains(testValue))
 	s.Assert().Equal(false, s.listWithOneItem.Contains(testValue))
 	s.Assert().Equal(false, s.listWithTwoItems.Contains(testValue))
@@ -202,14 +217,14 @@ func (s *ListTestSuite) TesContainsShouldReturnFalseIfListDoesNotContainItem() {
 }
 
 func (s *ListTestSuite) TestContainsShouldReturnTrueIfListDoesNotContainItem() {
-	testValue := "single"
+	testValue := &testData{"single"}
 	s.Assert().Equal(true, s.listWithOneItem.Contains(testValue))
 	s.Assert().Equal(true, s.listWithTwoItems.Contains(testValue))
 	s.Assert().Equal(true, s.listWithManyItems.Contains(testValue))
 }
 
 func (s *ListTestSuite) TestIndexOfShouldReturnNegativeOneIfListDoesNotContainItem() {
-	testValue := "a"
+	testValue := &testData{"a"}
 	s.Assert().Equal(-1, s.emptyList.IndexOf(testValue))
 	s.Assert().Equal(-1, s.listWithOneItem.IndexOf(testValue))
 	s.Assert().Equal(-1, s.listWithTwoItems.IndexOf(testValue))
@@ -217,14 +232,14 @@ func (s *ListTestSuite) TestIndexOfShouldReturnNegativeOneIfListDoesNotContainIt
 }
 
 func (s *ListTestSuite) TestIndexOfShouldReturnIndexIfListContainsItem() {
-	testValue := "single"
+	testValue := &testData{"single"}
 	s.Assert().Equal(0, s.listWithOneItem.IndexOf(testValue))
 	s.Assert().Equal(1, s.listWithTwoItems.IndexOf(testValue))
 	s.Assert().Equal(3, s.listWithManyItems.IndexOf(testValue))
 }
 
 func (s *ListTestSuite) TestPushShouldAddNodeToHead() {
-	nodeValue := "new"
+	nodeValue := &testData{"new"}
 
 	s.emptyList.Push(nodeValue)
 	s.Assert().Equal(nodeValue, s.emptyList.head.data)
@@ -245,24 +260,24 @@ func (s *ListTestSuite) TestPushShouldAddNodeToHead() {
 
 	s.listWithManyItems.Push(nodeValue)
 	s.Assert().Equal(nodeValue, s.listWithManyItems.head.data)
-	s.Assert().Equal("1", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.next.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.next.data)
 	s.Assert().Equal(s.singleNodeValue, s.listWithManyItems.head.next.next.next.next.data)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
 	s.Assert().Equal(5, s.listWithManyItems.length)
 }
 
 func (s *ListTestSuite) TestRemoveShouldReturnErrorIfListDoesNotContainItem() {
-	nodeValue := "0"
-	s.Assert().EqualError(s.emptyList.Remove(nodeValue), "[error: \"0\" not found]")
-	s.Assert().EqualError(s.listWithOneItem.Remove(nodeValue), "[error: \"0\" not found]")
-	s.Assert().EqualError(s.listWithTwoItems.Remove(nodeValue), "[error: \"0\" not found]")
-	s.Assert().EqualError(s.listWithManyItems.Remove(nodeValue), "[error: \"0\" not found]")
+	nodeValue := &testData{"0"}
+	s.Assert().EqualError(s.emptyList.Remove(nodeValue), "[error: \"&{0}\" not found]")
+	s.Assert().EqualError(s.listWithOneItem.Remove(nodeValue), "[error: \"&{0}\" not found]")
+	s.Assert().EqualError(s.listWithTwoItems.Remove(nodeValue), "[error: \"&{0}\" not found]")
+	s.Assert().EqualError(s.listWithManyItems.Remove(nodeValue), "[error: \"&{0}\" not found]")
 }
 
 func (s *ListTestSuite) TestRemoveShouldRemoveItemIfListContainsItem() {
-	nodeValue := "single"
+	nodeValue := &testData{"single"}
 	err := s.listWithOneItem.Remove(nodeValue)
 	s.Assert().Equal(s.emptyList, s.listWithOneItem)
 	s.Assert().Nil(err)
@@ -270,17 +285,17 @@ func (s *ListTestSuite) TestRemoveShouldRemoveItemIfListContainsItem() {
 
 	err = s.listWithTwoItems.Remove(nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("1", s.listWithTwoItems.head.data)
-	s.Assert().Equal("1", s.listWithTwoItems.tail.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithTwoItems.head.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithTwoItems.tail.data)
 	s.Assert().Nil(s.listWithTwoItems.head.next)
 	s.Assert().Nil(s.listWithTwoItems.tail.next)
 
 	err = s.listWithManyItems.Remove(nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.tail.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.tail.data)
 	s.Assert().Equal(3, s.listWithManyItems.length)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
 }
@@ -308,37 +323,37 @@ func (s *ListTestSuite) TestRemoveByIndexShouldRemoveIndexedItem() {
 
 	err = s.listWithTwoItems.RemoveByIndex(index)
 	s.Assert().Nil(err)
-	s.Assert().Equal("single", s.listWithTwoItems.head.data)
-	s.Assert().Equal("single", s.listWithTwoItems.tail.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithTwoItems.head.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithTwoItems.tail.data)
 	s.Assert().Nil(s.listWithTwoItems.head.next)
 	s.Assert().Nil(s.listWithTwoItems.tail.next)
 
 	index = 3
 	err = s.listWithManyItems.RemoveByIndex(index)
 	s.Assert().Nil(err)
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.head.next.next.data)
-	s.Assert().Equal("3", s.listWithManyItems.tail.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"3"}, s.listWithManyItems.tail.data)
 	s.Assert().Equal(3, s.listWithManyItems.length)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
 }
 
 func (s *ListTestSuite) TestSetShouldReturnErrorIfIndexExceededLength() {
 	index := 5
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 	s.Assert().EqualError(s.listWithTwoItems.Set(index, nodeValue), "[invalid index: exceeded maximum index (1)]")
 }
 func (s *ListTestSuite) TestSetShouldReturnErrorIfIndexIsNegative() {
 	index := -10
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 
 	s.Assert().EqualError(s.listWithTwoItems.Set(index, nodeValue), "[invalid index: should be [0 - 1]]")
 }
 
 func (s *ListTestSuite) TestSetShouldReturnErrorIfListIsEmpty() {
 	index := 0
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 
 	s.Assert().EqualError(s.emptyList.Set(index, nodeValue), "[error: empty list]")
 }
@@ -346,11 +361,11 @@ func (s *ListTestSuite) TestSetShouldReturnErrorIfListIsEmpty() {
 func (s *ListTestSuite) TestSetShouldSetItemAsHeadAndTailIfListHasOneNode() {
 
 	index := 0
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 	err := s.listWithOneItem.Set(index, nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("0", s.listWithOneItem.head.data)
-	s.Assert().Equal("0", s.listWithOneItem.tail.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithOneItem.head.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithOneItem.tail.data)
 	s.Assert().Nil(s.listWithOneItem.head.next)
 	s.Assert().Nil(s.listWithOneItem.tail.next)
 	s.Assert().Equal(1, s.listWithOneItem.length)
@@ -358,38 +373,38 @@ func (s *ListTestSuite) TestSetShouldSetItemAsHeadAndTailIfListHasOneNode() {
 
 func (s *ListTestSuite) TestSetShouldSetItemAsHeadOrTailIfListHasTwoNodes() {
 
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 
 	index := 0
 	err := s.listWithTwoItems.Set(index, nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("0", s.listWithTwoItems.head.data)
-	s.Assert().Equal("single", s.listWithTwoItems.head.next.data)
-	s.Assert().Equal("single", s.listWithTwoItems.tail.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithTwoItems.head.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithTwoItems.head.next.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithTwoItems.tail.data)
 	s.Assert().Nil(s.listWithTwoItems.tail.next)
 	s.Assert().Equal(2, s.listWithTwoItems.length)
 
 	index = 1
 	err = s.listWithTwoItems.Set(index, nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("0", s.listWithTwoItems.head.data)
-	s.Assert().Equal("0", s.listWithTwoItems.head.next.data)
-	s.Assert().Equal("0", s.listWithTwoItems.tail.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithTwoItems.head.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithTwoItems.head.next.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithTwoItems.tail.data)
 	s.Assert().Nil(s.listWithTwoItems.tail.next)
 	s.Assert().Equal(2, s.listWithTwoItems.length)
 }
 
 func (s *ListTestSuite) TestSetShouldSetItemAsIndexedIfListHasManyNodes() {
 
-	nodeValue := "0"
+	nodeValue := &testData{"0"}
 	index := 2
 	err := s.listWithManyItems.Set(index, nodeValue)
 	s.Assert().Nil(err)
-	s.Assert().Equal("1", s.listWithManyItems.head.data)
-	s.Assert().Equal("2", s.listWithManyItems.head.next.data)
-	s.Assert().Equal("0", s.listWithManyItems.head.next.next.data)
-	s.Assert().Equal("single", s.listWithManyItems.head.next.next.next.data)
-	s.Assert().Equal("single", s.listWithManyItems.tail.data)
+	s.Assert().Equal(&testData{"1"}, s.listWithManyItems.head.data)
+	s.Assert().Equal(&testData{"2"}, s.listWithManyItems.head.next.data)
+	s.Assert().Equal(&testData{"0"}, s.listWithManyItems.head.next.next.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithManyItems.head.next.next.next.data)
+	s.Assert().Equal(&testData{"single"}, s.listWithManyItems.tail.data)
 	s.Assert().Equal(4, s.listWithManyItems.length)
 	s.Assert().Nil(s.listWithManyItems.tail.next)
 }
