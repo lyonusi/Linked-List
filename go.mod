@@ -1,4 +1,4 @@
-module linkedList
+module github.com/lyonusi/Linked-List
 
 go 1.15
 

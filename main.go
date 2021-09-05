@@ -2,8 +2,23 @@ package main
 
 import (
 	"fmt"
-	"linkedList/list"
+
+	"github.com/lyonusi/Linked-List/list"
 )
+
+type testData struct {
+	data string
+}
+
+func (t *testData) Compare(d list.Data) (bool, error) {
+	// Convert input d (a struct implementing list.Data interface) to TestData, "ok" will be false if fields of d not match with fields in TestData
+	compareData, ok := d.(*testData)
+	if !ok {
+		return false, fmt.Errorf("Input cannot be converted to TestData")
+	} else {
+		return t.data == compareData.data, nil
+	}
+}
 
 func main() {
 	list := list.NewLinkedList()
@@ -46,6 +61,7 @@ func main() {
 
 	list.Set(1, t)
 	fmt.Println(list.IndexOf(test{num: 3, text: "three"}))
+
 	list.Print()
 	fmt.Println("")
 	fmt.Println("")
