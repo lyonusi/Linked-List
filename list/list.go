@@ -37,6 +37,7 @@ func NewLinkedList() LinkedList {
 	return &linkedList{}
 }
 
+
 func (l *linkedList) GetHead() (Data, error) {
 	fmt.Printf("...Getting head of the list...")
 	if l.length == 0 {
@@ -50,6 +51,7 @@ func (l *linkedList) GetLength() (len int) {
 	return l.length
 }
 
+
 func (l *linkedList) GetTail() (Data, error) {
 	fmt.Printf("...Getting tail of the list...")
 	if l.length == 0 {
@@ -60,8 +62,8 @@ func (l *linkedList) GetTail() (Data, error) {
 }
 
 func (l *linkedList) Print() {
-	fmt.Printf("...Printing...\n")
-	fmt.Printf("-------- START --------\n")
+	// fmt.Printf("...Printing...\n")
+	fmt.Printf("-------- PRINTING ---------\n")
 	pointer := l.head
 	for pointer != nil {
 		fmt.Printf("%+v -> ", pointer.data)

@@ -22,26 +22,52 @@ func (t *testData) Compare(d list.Data) (bool, error) {
 
 func main() {
 	list := list.NewLinkedList()
-	list.Add(&testData{"00"})
-	list.Add(&testData{"aa"})
-	list.Add(&testData{"bb"})
-	list.Add(&testData{"cc"})
-	list.InsertAfter(-4, &testData{"dd"})
+	fmt.Println("===============================================================")
+	fmt.Println("===============================================================")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+
+	list.Add(123)
+	list.Add("aa")
+	list.Add("bb")
+	list.Add("cc")
+	// list.InsertAfter(-4, "dd")
+	// list.Print()
+	// fmt.Println(list.Contains("cc"))
+	// list.Pop()
+	// list.Print()
+	// fmt.Println(list.Contains("00"))
+	// fmt.Println(list.IndexOf("cc"))
+	// fmt.Println(list.IndexOf("00"))
+	// list.Print()
+	// list.Remove("ee")
+	// list.Push("22")
+	// list.Push("11")
+	// list.Push("00")
+	// list.RemoveByIndex(1)
+	// list.Print()
+	// list.Set(6, "11")
+
+	type test struct {
+		num  int
+		text string
+	}
+
+	t := test{
+		num:  3,
+		text: "three"}
+
+	list.Set(1, t)
+	fmt.Println(list.IndexOf(test{num: 3, text: "three"}))
+
 	list.Print()
-	fmt.Println(list.Contains(&testData{"cc"}))
-	list.Pop()
-	list.Print()
-	fmt.Println(list.Contains(&testData{"00"}))
-	fmt.Println(list.IndexOf(&testData{"cc"}))
-	fmt.Println(list.IndexOf(&testData{"00"}))
-	list.Print()
-	list.Remove(&testData{"ee"})
-	list.Push(&testData{"22"})
-	list.Push(&testData{"11"})
-	list.Push(&testData{"00"})
-	list.RemoveByIndex(1)
-	list.Print()
-	list.Set(6, &testData{"11"})
-	list.Set(1, &testData{"11"})
-	list.Print()
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("")
+
+	fmt.Println("===============================================================")
+	fmt.Println("===============================================================")
 }
